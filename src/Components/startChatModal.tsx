@@ -9,7 +9,12 @@ import { useRouter } from 'next/navigation';
 
 
 
-export default function StartChatModal({ isOpen, onClose }) {
+interface StartChatModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function StartChatModal({ isOpen, onClose }: StartChatModalProps) {
   // --- 1. ALWAYS CALL HOOKS AT THE TOP ---
 
   const {username} = useUsername({isOpen});
