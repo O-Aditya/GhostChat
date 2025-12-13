@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GhostChat - Real-Time Self-Destructing Messaging
 
-## Getting Started
+GhostChat is a modern, privacy-focused real-time messaging application. It allows users to create anonymous, temporary chat rooms where messages self-destruct after a set period.
 
-First, run the development server:
+Built with **Next.js 16**, **ElysiaJS**, and **Upstash Redis**, it features instant syncing and ephemeral storage, ensuring that your conversations don't leave a permanent footprint.
+
+![GhostChat Banner](https://via.placeholder.com/1200x600/050505/3b82f6?text=GhostChat+Realtime+Messaging)
+
+## 🚀 Key Features
+
+* **💣 Self-Destructing Messages**: Rooms and messages automatically expire and are wiped from the server after a set TTL (Time To Live).
+* **⚡ Real-Time Communication**: Instant messaging powered by `@upstash/realtime` and WebSockets.
+* **👤 100% Anonymous**: No login required. Identities (e.g., `Anonymous-Wolf-4921`) are generated on the fly.
+* **🎨 Modern UI**: Built with Tailwind CSS v4 and Framer Motion for smooth animations.
+
+## 🛠️ Tech Stack
+
+**Frontend**
+* **Framework**: Next.js 16 (App Router)
+* **Styling**: Tailwind CSS v4, Lucide React (Icons)
+* **State/Data**: TanStack Query (React Query)
+* **Animations**: Motion (Framer Motion)
+
+**Backend & Database**
+* **API Framework**: ElysiaJS (running via Next.js API routes)
+* **Database**: Upstash Redis (Serverless Key-Value Store)
+* **Realtime**: Upstash Realtime (WebSocket/Server-Sent Events)
+* **Validation**: Zod
+
+## ⚙️ Prerequisites
+
+Before you begin, ensure you have the following:
+
+* Node.js 18+ installed.
+* An [Upstash](https://upstash.com/) account (Free tier works perfectly).
+
+## 📦 Installation & Setup
+
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/yourusername/ghostchat.git](https://github.com/yourusername/ghostchat.git)
+    cd ghostchat
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    # or
+    yarn install
+    # or
+    pnpm install
+    ```
+
+3.  **Environment Configuration**
+    Create a `.env.local` file in the root directory and add your Upstash credentials.
+
+    ```env
+    # .env.local
+
+    # Upstash Redis Database
+    UPSTASH_REDIS_REST_URL="[https://your-database-url.upstash.io](https://your-database-url.upstash.io)"
+    UPSTASH_REDIS_REST_TOKEN="your-redis-token"
+    ```
+
+4.  **Run the Development Server**
+    ```bash
+    npm run dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) with your browser to start chatting.
+
+## 📂 Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+├── app/
+│   ├── api/             # ElysiaJS Backend Routes
+│   ├── room/[id]/       # Chat Room Page
+│   └── page.tsx         # Landing Page
+├── components/          # UI Components (Modals, Chat Bubbles)
+├── lib/
+│   ├── redis.ts         # Redis Client
+│   ├── realtime.ts      # Realtime Client
+│   └── utils.ts         # Helper functions
+└── public/              # Static assets
