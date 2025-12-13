@@ -38,7 +38,7 @@ Before you begin, ensure you have the following:
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/yourusername/ghostchat.git](https://github.com/yourusername/ghostchat.git)
+    git clone [https://github.com/O-Aditya/ghostchat.git](https://github.com/O-Aditya/ghostchat.git)
     cd ghostchat
     ```
 
