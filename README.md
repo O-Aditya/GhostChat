@@ -4,7 +4,7 @@ GhostChat is a modern, privacy-focused real-time messaging application. It allow
 
 Built with **Next.js 16**, **ElysiaJS**, and **Upstash Redis**, it features instant syncing and ephemeral storage, ensuring that your conversations don't leave a permanent footprint.
 
-![GhostChat Banner](https://via.placeholder.com/1200x600/050505/3b82f6?text=GhostChat+Realtime+Messaging)
+
 
 ## 🚀 Key Features
 
@@ -44,7 +44,7 @@ Before you begin, ensure you have the following:
 
 2.  **Install dependencies**
     ```bash
-    npm install
+    bun install
     # or
     yarn install
     # or
