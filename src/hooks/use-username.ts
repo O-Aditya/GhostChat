@@ -15,7 +15,7 @@ const Animals = [
     return `anonymous-${word.toLowerCase()}-${nanoid(5)}`;
   };
 
-export const useUsername = ({isOpen}) => {
+export const useUsername = ({ isOpen }: { isOpen: boolean }) => {
 
      const [username, setUsername] = useState('');
 
