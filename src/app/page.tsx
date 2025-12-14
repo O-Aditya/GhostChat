@@ -296,7 +296,7 @@ React.useEffect(() => {
       </section>
 
       {/* --- Footer --- */}
-      <footer className="py-12 border-t border-white/10 bg-[#050505] text-center md:text-left px-6">
+      <footer className="py-8 border-t border-white/10 bg-[#050505] text-center md:text-left px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           
           {/* Brand Logo */}
