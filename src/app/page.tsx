@@ -2,6 +2,7 @@
 
 import React, { Suspense } from 'react';
 import { Shield, Timer, Ghost, Lock, Zap, ChevronRight, Menu, X } from 'lucide-react';
+import { FaGithub } from "react-icons/fa"
 import StartChatModal from '../Components/startChatModal';
 import { useSearchParams } from 'next/navigation';
 import {BackgroundBeams} from '../Components/ui/background-beams';
@@ -269,11 +270,19 @@ export default Page;
             <Ghost className="w-6 h-6 text-gray-500" />
             <span className="font-bold text-gray-300">GhostChat</span>
           </div>
+          
           <p className="text-gray-600 text-sm">© {new Date().getFullYear()} GhostChat Inc. Stay hidden.</p>
+          
           <div className="flex gap-6 text-sm text-gray-500">
-            <a href="#" className="hover:text-white transition">Privacy</a>
-            <a href="#" className="hover:text-white transition">Terms</a>
-            <a href="#" className="hover:text-white transition">Twitter</a>
+            <a 
+              href="https://github.com/O-Aditya/ghostchat.git" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-white transition"
+            >
+              <FaGithub className="w-4 h-4" />
+              <span>Source Code</span>
+            </a>
           </div>
         </div>
       </footer>
