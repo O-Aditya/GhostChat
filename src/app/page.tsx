@@ -6,6 +6,7 @@ import { FaGithub } from "react-icons/fa"
 import StartChatModal from '../Components/startChatModal';
 import { useSearchParams } from 'next/navigation';
 import {BackgroundBeams} from '../Components/ui/background-beams';
+import Image from 'next/image';
 
 
 const Page = () =>{
@@ -297,16 +298,34 @@ React.useEffect(() => {
       {/* --- Footer --- */}
       <footer className="py-12 border-t border-white/10 bg-[#050505] text-center md:text-left px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          
+          {/* Brand Logo */}
           <div className="flex items-center gap-2">
             <Ghost className="w-6 h-6 text-gray-500" />
             <span className="font-bold text-gray-300">GhostChat</span>
           </div>
           
-          <p className="text-gray-600 text-sm">© {new Date().getFullYear()} GhostChat Inc. Stay hidden.</p>
-          
+          {/* Credits Section */}
+                 <p className="text-gray-600 text-sm flex items-center gap-1">
+                               Made with <span className="text-red-900">♥</span> by 
+  
+                         <a href="https://github.com/O-Aditya" className="flex items-center gap-2 hover:text-white transition group">
+                        
+                          <Image 
+                            src="https://github.com/O-Aditya.png" 
+                            alt="Profile" 
+                            width={20} 
+                            height={20} 
+                            className="w-5 h-5 rounded-full border border-gray-700 group-hover:border-white/50 transition"
+                          />
+                                      <span className="font-medium">Aditya</span>
+                            </a>
+                  </p>
+                  
+          {/* Source Code Link */}
           <div className="flex gap-6 text-sm text-gray-500">
             <a 
-              href="https://github.com/O-Aditya/ghostchat.git" 
+              href="https://github.com/O-Aditya/GhostChat.git" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:text-white transition"
