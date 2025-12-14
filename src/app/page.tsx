@@ -17,6 +17,34 @@ return <Suspense>
 export default Page;
 
  function Home() {
+
+
+const [isVisible, setIsVisible] = React.useState(true);
+const [lastScrollY, setLastScrollY] = React.useState(0);
+
+React.useEffect(() => {
+  const controlNavbar = () => {
+    if (typeof window !== 'undefined') {
+      
+      if (window.scrollY > lastScrollY && window.scrollY > 100) { 
+        setIsVisible(false); 
+      } else {
+        setIsVisible(true);  
+      }
+
+      
+      setLastScrollY(window.scrollY); 
+    }
+  };
+
+  window.addEventListener('scroll', controlNavbar);
+
+ 
+  return () => {
+    window.removeEventListener('scroll', controlNavbar);
+  };
+}, [lastScrollY]);
+
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -29,7 +57,10 @@ export default Page;
     <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500 selection:text-white font-sans">
       <BackgroundBeams /> 
       {/* --- Navigation --- */}
-      <nav className="fixed w-full z-50 top-0   backdrop-blur-xl">
+      <nav 
+        className={`fixed w-full z-50 top-0 transition-transform duration-300 ease-in-out
+          ${isVisible ? 'translate-y-0' : '-translate-y-full'} `}
+      >
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer">
             <Ghost className="w-8 h-8 text-blue-500" />
