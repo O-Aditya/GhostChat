@@ -484,7 +484,7 @@ function Home() {
         </div>
 
         {/* 3. THE WATERMARK */}
-        <section className="relative px-4 max-w-[1080px] text-center flex items-center justify-center gap-2 mx-auto pb-2 text-[9rem] sm:text-[14rem] md:text-[19rem] lg:text-[20rem] leading-[1] pointer-events-none font-bold -mb-[11%] sm:-mb-[7%] duration-200 ease-in-out">
+        <section className="relative px-4 max-w-[1080px] text-center flex items-center justify-center gap-2 mx-auto pb-8 text-[9rem] sm:text-[14rem] md:text-[19rem] lg:text-[20rem] leading-[1] pointer-events-none font-bold -mb-[11%] sm:-mb-[7%] duration-200 ease-in-out">
 
           {/* 1. TEXT: 
       - We set color to matches background (#050505) 
