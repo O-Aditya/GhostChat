@@ -2,9 +2,11 @@
 
 import React, { Suspense } from 'react';
 import { Shield, Timer, Ghost, Lock, Zap, ChevronRight, Menu, X } from 'lucide-react';
+import {  ShieldCheck, FileWarning, Users, AlertTriangle } from 'lucide-react';
 import { FaGithub } from "react-icons/fa"
 import StartChatModal from '../Components/startChatModal';
 import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { BackgroundBeams } from '../Components/ui/background-beams';
 import Image from 'next/image';
 
@@ -19,9 +21,15 @@ export default Page;
 
 function Home() {
 
-
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+ 
   const [isVisible, setIsVisible] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isDismissed, setIsDismissed] = React.useState(false);
 
   React.useEffect(() => {
     const controlNavbar = () => {
@@ -46,12 +54,26 @@ function Home() {
     };
   }, [lastScrollY]);
 
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  const searchParams = useSearchParams();
+
+  
   const wasDestroyed = searchParams.get('destroyed') === 'true';
   const error = searchParams.get('error');
+
+  React.useEffect(() => {
+    setIsDismissed(false);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    if (wasDestroyed || error) {
+        setIsDismissed(false);
+    }
+  }, [searchParams, wasDestroyed, error]);
+
+  const handleDismiss = () => {
+    setIsDismissed(true); // Hide immediately
+    router.replace(pathname); // Remove ?destroyed=true from URL
+  };
 
   return (
 
@@ -98,23 +120,107 @@ function Home() {
         )}
       </nav>
 
-      {wasDestroyed && (
-        <div className="mt-24 max-w-3xl mx-auto bg-red-600/20 border border-red-500 text-red-300 px-6 py-4 rounded-lg text-center">
-          <strong className="font-semibold">Room Destroyed:</strong> The chat room has been successfully destroyed and all messages have been deleted.
-        </div>
-      )}
+      <div className="fixed top-24 left-0 w-full px-4 z-40 flex justify-center pointer-events-none">
+        
+        {!isDismissed && (
+          <>
+            {/* 1. SUCCESS: Room Destroyed */}
+            {wasDestroyed && (
+              <div className="pointer-events-auto max-w-lg w-full bg-[#09090b]/80 backdrop-blur-md border border-green-500/30 rounded-lg shadow-[0_0_30px_-10px_rgba(34,197,94,0.3)] animate-in slide-in-from-top-4 fade-in duration-300">
+                <div className="flex items-start p-4 gap-4">
+                  <div className="p-2 bg-green-500/10 rounded-md border border-green-500/20">
+                    <ShieldCheck className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-bold text-green-400 font-mono tracking-wide uppercase flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                      System Purged
+                    </h3>
+                    <p className="text-sm text-zinc-300 leading-relaxed">
+                      Protocol complete. Room data has been incinerated and logs wiped.
+                    </p>
+                  </div>
+                  <button onClick={handleDismiss} className="text-zinc-500 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                {/* Visual Progress Bar to imply action completed */}
+                <div className="h-0.5 w-full bg-green-900/50">
+                   <div className="h-full w-full bg-green-500/50 origin-left animate-[grow_1s_ease-out]"></div>
+                </div>
+              </div>
+            )}
 
-      {error === 'room-not-found' && (
-        <div className="mt-24 max-w-3xl mx-auto bg-red-600/20 border border-red-500 text-red-300 px-6 py-4 rounded-lg text-center">
-          <strong className="font-semibold">Error:</strong> The requested chat room does not exist.
-        </div>
-      )}
+            {/* 2. ERROR: Room Not Found */}
+            {error === 'room-not-found' && (
+              <div className="pointer-events-auto max-w-lg w-full bg-[#09090b]/80 backdrop-blur-md border border-red-500/30 rounded-lg shadow-[0_0_30px_-10px_rgba(239,68,68,0.3)] animate-in slide-in-from-top-4 fade-in duration-300">
+                <div className="flex items-start p-4 gap-4">
+                  <div className="p-2 bg-red-500/10 rounded-md border border-red-500/20">
+                    <FileWarning className="w-5 h-5 text-red-400" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-bold text-red-400 font-mono tracking-wide uppercase flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                      Connection Failed
+                    </h3>
+                    <p className="text-sm text-zinc-300 leading-relaxed">
+                      Target coordinates invalid. The room ID does not exist or has already expired.
+                    </p>
+                  </div>
+                  <button onClick={handleDismiss} className="text-zinc-500 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
 
-      {error === "room-full" && (
-        <div className="mt-24 max-w-3xl mx-auto bg-red-600/20 border border-red-500 text-red-300 px-6 py-4 rounded-lg text-center">
-          <strong className="font-semibold">Error:</strong> The chat room is full. Please try joining another room.
-        </div>
-      )}
+            {/* 3. ERROR: Room Full */}
+            {error === "room-full" && (
+              <div className="pointer-events-auto max-w-lg w-full bg-[#09090b]/80 backdrop-blur-md border border-amber-500/30 rounded-lg shadow-[0_0_30px_-10px_rgba(245,158,11,0.3)] animate-in slide-in-from-top-4 fade-in duration-300">
+                <div className="flex items-start p-4 gap-4">
+                  <div className="p-2 bg-amber-500/10 rounded-md border border-amber-500/20">
+                    <Users className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-bold text-amber-400 font-mono tracking-wide uppercase flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      Capacity Reached
+                    </h3>
+                    <p className="text-sm text-zinc-300 leading-relaxed">
+                      Bandwidth limit exceeded. This secure channel is currently full.
+                    </p>
+                  </div>
+                  <button onClick={handleDismiss} className="text-zinc-500 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {/* 4. GENERIC ERROR */}
+             {error && error !== 'room-not-found' && error !== 'room-full' && (
+              <div className="pointer-events-auto max-w-lg w-full bg-[#09090b]/80 backdrop-blur-md border border-zinc-500/30 rounded-lg shadow-lg animate-in slide-in-from-top-4 fade-in duration-300">
+                <div className="flex items-start p-4 gap-4">
+                  <div className="p-2 bg-zinc-500/10 rounded-md border border-zinc-500/20">
+                    <AlertTriangle className="w-5 h-5 text-zinc-400" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-bold text-zinc-400 font-mono tracking-wide uppercase">
+                      System Error
+                    </h3>
+                    <p className="text-sm text-zinc-300 leading-relaxed">
+                      {error}
+                    </p>
+                  </div>
+                  <button onClick={handleDismiss} className="text-zinc-500 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
 
       {/* --- Hero Section --- */}
@@ -378,20 +484,23 @@ function Home() {
         </div>
 
         {/* 3. THE WATERMARK */}
-        <section className="relative px-4 max-w-[1080px] text-center flex items-center justify-center gap-2 mx-auto pb-8 text-[9rem] sm:text-[14rem] md:text-[19rem] lg:text-[20rem] leading-[1] pointer-events-none font-bold -mb-[11%] sm:-mb-[7%] duration-200 ease-in-out">
+        <section className="relative px-4 max-w-[1080px] text-center flex items-center justify-center gap-2 mx-auto pb-2 text-[9rem] sm:text-[14rem] md:text-[19rem] lg:text-[20rem] leading-[1] pointer-events-none font-bold -mb-[11%] sm:-mb-[7%] duration-200 ease-in-out">
 
-
+          {/* 1. TEXT: 
+      - We set color to matches background (#050505) 
+      - We use textShadow to add a faint white "light" above the text, creating the depth.
+  */}
           <div
-            className=""
+            className="animate-[pulse_8s_infinite]"
             style={{
-              color: '#050505',
-              textShadow: '0px -2px 0px rgba(255,255,255,0.15), 0px 8px px rgba(0,0,0,0.5)'
+              color: '#050505', // Blend with bg
+              textShadow: '0px -1px 0px rgba(255,255,255,0.15), 0px 8px 5px rgba(0,0,0,0.5)'
             }}
           >
             0trace
           </div>
 
-
+          {/* 2. GRADIENT MASK: Fades the bottom of the text into the floor */}
           <div className="bg-gradient-to-b from-transparent via-[#050505] to-[#050505] h-[40%] w-full absolute bottom-0 left-0 z-20"></div>
 
         </section>
