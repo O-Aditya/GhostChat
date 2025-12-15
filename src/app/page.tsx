@@ -73,7 +73,9 @@ React.useEffect(() => {
             <a href="#features" className="text-sm text-gray-400 hover:text-white transition ">Features</a>
             <a href="#security" className="text-sm text-gray-400 hover:text-white transition">Security</a>
             
-            <button className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-200 transition">
+            <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-200 transition">
               Get Started
             </button>
           </div>
@@ -89,7 +91,9 @@ React.useEffect(() => {
           <div className="md:hidden absolute w-full bg-[#050505] border-b border-white/10 p-6 flex flex-col gap-4">
             <a href="#" className="text-gray-400 hover:text-white">Features</a>
             <a href="#" className="text-gray-400 hover:text-white">Security</a>
-            <button className="bg-blue-600 w-full py-3 rounded-lg font-semibold mt-2">Get Started</button>
+            <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 w-full py-3 rounded-lg font-semibold mt-2">Get Started</button>
           </div>
         )}
       </nav>
