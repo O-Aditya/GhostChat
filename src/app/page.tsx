@@ -491,7 +491,7 @@ function Home() {
       - We use textShadow to add a faint white "light" above the text, creating the depth.
   */}
           <div
-            className="animate-[pulse_8s_infinite]"
+            className=""
             style={{
               color: '#050505', // Blend with bg
               textShadow: '0px -1px 0px rgba(255,255,255,0.15), 0px 8px 5px rgba(0,0,0,0.5)'
