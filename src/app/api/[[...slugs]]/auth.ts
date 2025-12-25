@@ -21,7 +21,9 @@ export const authMiddleware = new Elysia({name:"auth"})
     })
     .derive({ as: "scoped"} , async({query , cookie}) =>{
         const roomId = query.roomId 
-        const token = cookie["x-auth-token"].value as string || undefined
+        const token: string | undefined = typeof cookie["x-auth-token"] === 'object' 
+            ? (cookie["x-auth-token"] as { value: string }).value 
+            : (cookie["x-auth-token"] as string) || undefined;
 
         if(!roomId || !token){
             throw new AuthError ("Missing roomId or token")
@@ -35,20 +37,21 @@ export const authMiddleware = new Elysia({name:"auth"})
         // Ensure connected is always an Array
         let connected: string[] = [];
         
-        if (Array.isArray(rawConnected)) {
-            connected = rawConnected;
-        } else if (typeof rawConnected === 'string') {
+        if (typeof rawConnected === 'string') {
             try {
-                connected = JSON.parse(rawConnected);
+                const parsed = JSON.parse(rawConnected);
+                if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+                    connected = parsed;
+                }
             } catch (e) {
                 connected = [];
             }
         }
         // --- FIX END ---
 
-        if(!connected?.includes(token)){
-            throw new AuthError ("Invalid token")
-        }
+        if(!connected.includes(token)){
+            throw new AuthError("Invalid token or user not in room")
+       }
 
         return {auth:{roomId , token , connected}}
 
