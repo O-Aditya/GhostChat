@@ -1,67 +1,67 @@
-import { NextRequest, NextResponse } from "next/server"
-import { redis } from "./lib/redis"
-import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server";
 
-export const proxy = async (req : NextRequest) =>{
-    const pathname = req.nextUrl.pathname
-    const roomMatch = pathname.match(/^\/room\/([^/]+)$/)
-    
-    if(!roomMatch){
-        return NextResponse.redirect (new URL ("/", req.url))
-    }
-    const roomId = roomMatch[1]
+import { redis } from "./lib/redis";
 
-    // Fetch data (allow string or array type)
-    const meta = await redis.hgetall<{connected: string[] | string; createdAt:number}>(`meta:${roomId}`)
+import { nanoid } from "nanoid";
 
-    if(!meta){
-        return NextResponse.redirect (new URL ("/?error=room-not-found", req.url))
-    }
+export const proxy = async (req: NextRequest) => {
+  // This proxy ensures that the room page is pre-rendered on the server side
 
-    // --- FIX: Parse 'connected' correctly ---
-    let connectedUsers: string[] = []
-    
-    if (Array.isArray(meta.connected)) {
-        connectedUsers = meta.connected
-    } else if (typeof meta.connected === 'string') {
-        try {
-            connectedUsers = JSON.parse(meta.connected)
-        } catch (e) {
-            connectedUsers = []
-        }
-    }
-    // ----------------------------------------
+  //overview : check if user is allowed to join the room
 
-    const existingToken = req.cookies.get("x-auth-token")?.value
+  //if they are : pass them
 
-    // Use the parsed array for checks
-    if(existingToken && connectedUsers.includes(existingToken)){
-        return NextResponse.next()
-    }
+  // if not : redirect to lobby
 
-    // Now .length works correctly on the array (1 user = length 1)
-    if(connectedUsers.length >= 2 ){
-        return NextResponse.redirect (new URL ("/?error=room-full", req.url))
-    }
+  const pathname = req.nextUrl.pathname;
 
-    const response = NextResponse.next()
-    const token = nanoid()
+  const roomMatch = pathname.match(/^\/room\/([^/]+)$/);
 
-    response.cookies.set("x-auth-token", token, {
-        path:"/",
-        httpOnly:true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",    
-    })
+  if (!roomMatch) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 
-    // Save back to Redis
-    await redis.hset(`meta:${roomId}`,{
-        connected: [...connectedUsers, token],
-    })
+  const roomId = roomMatch[1];
 
-    return response
-}
+  const meta = await redis.hgetall<{ connected: string[]; createdAt: number }>(
+    `meta:${roomId}`
+  );
 
-export const config ={
-    matcher:"/room/:path*"
-}
+  if (!meta) {
+    return NextResponse.redirect(new URL("/?error=room-not-found", req.url));
+  }
+
+  const existingToken = req.cookies.get("x-auth-token")?.value;
+
+  if (existingToken && meta.connected.includes(existingToken)) {
+    return NextResponse.next();
+  }
+
+  if (meta.connected.length >= 2) {
+    return NextResponse.redirect(new URL("/?error=room-full", req.url));
+  }
+
+  const response = NextResponse.next();
+
+  const token = nanoid();
+
+  response.cookies.set("x-auth-token", token, {
+    path: "/",
+
+    httpOnly: true,
+
+    sameSite: "strict",
+
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  await redis.hset(`meta:${roomId}`, {
+    connected: [...(meta.connected || []), token],
+  });
+
+  return response;
+};
+
+export const config = {
+  matcher: "/room/:path*",
+};
