@@ -2,36 +2,45 @@ import { NextRequest, NextResponse } from "next/server"
 import { redis } from "./lib/redis"
 import { nanoid } from "nanoid"
 
-
-
-
-
 export const proxy = async (req : NextRequest) =>{
-    // This proxy ensures that the room page is pre-rendered on the server side
-    //overview : check if user is allowed to join the room 
-    //if they are : pass them 
-    // if not : redirect to lobby 
-
     const pathname = req.nextUrl.pathname
     const roomMatch = pathname.match(/^\/room\/([^/]+)$/)
+    
     if(!roomMatch){
         return NextResponse.redirect (new URL ("/", req.url))
     }
     const roomId = roomMatch[1]
 
-    const meta = await redis.hgetall<{connected:string[] ; createdAt:number}>(`meta:${roomId}`)
+    // Fetch data (allow string or array type)
+    const meta = await redis.hgetall<{connected: string[] | string; createdAt:number}>(`meta:${roomId}`)
 
     if(!meta){
         return NextResponse.redirect (new URL ("/?error=room-not-found", req.url))
     }
 
+    // --- FIX: Parse 'connected' correctly ---
+    let connectedUsers: string[] = []
+    
+    if (Array.isArray(meta.connected)) {
+        connectedUsers = meta.connected
+    } else if (typeof meta.connected === 'string') {
+        try {
+            connectedUsers = JSON.parse(meta.connected)
+        } catch (e) {
+            connectedUsers = []
+        }
+    }
+    // ----------------------------------------
+
     const existingToken = req.cookies.get("x-auth-token")?.value
 
-    if(existingToken && meta.connected.includes(existingToken)){
+    // Use the parsed array for checks
+    if(existingToken && connectedUsers.includes(existingToken)){
         return NextResponse.next()
     }
 
-    if(meta.connected.length >=2 ){
+    // Now .length works correctly on the array (1 user = length 1)
+    if(connectedUsers.length >= 2 ){
         return NextResponse.redirect (new URL ("/?error=room-full", req.url))
     }
 
@@ -43,17 +52,14 @@ export const proxy = async (req : NextRequest) =>{
         httpOnly:true,
         sameSite: "strict",
         secure: process.env.NODE_ENV === "production",    
-    }
-    )
-
-    await redis.hset(`meta:${roomId}`,{
-        connected: [...(meta.connected || []), token],
     })
 
+    // Save back to Redis
+    await redis.hset(`meta:${roomId}`,{
+        connected: [...connectedUsers, token],
+    })
 
     return response
-
-
 }
 
 export const config ={
